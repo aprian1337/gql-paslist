@@ -2,57 +2,24 @@ import { v4 as uuidv4 } from "uuid";
 import PassengerInput from "./PassengerInput";
 import ListPassenger from "./ListPassenger";
 import Header from "./Header";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
 
 import React from "react";
-import { useState } from "react/cjs/react.development";
+import { useEffect, useState } from "react/cjs/react.development";
 
-const GetPasList = gql`
-  query MyQuery {
-    paslist_visitors {
-      jenis_kelamin
-      id
+const GET_PAS_LIST = gql`
+  query MyQuery($_eq: Int_comparison_exp = {}) {
+    paslist_visitors(where: { id: $_eq }) {
       nama
+      id
+      jenis_kelamin
       umur
     }
   }
 `;
 export default function Home() {
-  const { data, loading, error } = useQuery(GetPasList);
-  const [state, setState] = useState({
-    data: [
-      {
-        id: uuidv4(),
-        nama: "Yoga",
-        umur: 22,
-        jenisKelamin: "Pria",
-      },
-      {
-        id: uuidv4(),
-        nama: "Ria",
-        umur: 19,
-        jenisKelamin: "Wanita",
-      },
-      {
-        id: uuidv4(),
-        nama: "Fahmi",
-        umur: 25,
-        jenisKelamin: "Pria",
-      },
-      {
-        id: uuidv4(),
-        nama: "Lala",
-        umur: 21,
-        jenisKelamin: "Wanita",
-      },
-      {
-        id: uuidv4(),
-        nama: "Ivan",
-        umur: 25,
-        jenisKelamin: "Pria",
-      },
-    ],
-  });
+  const [getPasList, { data, loading, error }] = useLazyQuery(GET_PAS_LIST);
+  const [input, setInput] = useState("");
 
   const hapusPengunjung = (id) => {
     this.setState({
@@ -73,11 +40,38 @@ export default function Home() {
       data: [...this.state.data, newData],
     });
   };
+
+  const handleChange = (e) => {
+    setInput(e.target.value);
+  };
+
+  useEffect(() => {
+    if (input.length > 0) {
+      getPasList({
+        variables: {
+          _eq: {
+            _eq: input,
+          },
+        },
+      });
+    } else {
+      getPasList();
+    }
+  }, [input]);
+
+  if (loading) return <p>Loading ...</p>;
+  if (error) return `Error! ${error}`;
+
   return (
     <div>
       <div>
         <Header />
-        {/* {console.log(data)} */}
+        <input
+          type="text"
+          placeholder="Search"
+          value={input}
+          onChange={handleChange}
+        />
         <ListPassenger
           data={data?.paslist_visitors}
           hapusPengunjung={hapusPengunjung}
