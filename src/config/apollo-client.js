@@ -1,16 +1,12 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  useQuery,
-  gql,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache } from "@apollo/client";
 
 const client = new ApolloClient({
-  uri: "https://measured-sloth-21.hasura.app/v1/graphql",
+  uri: "https://trusted-gannet-53.hasura.app/v1/graphql",
   cache: new InMemoryCache(),
   headers: {
     "x-hasura-admin-secret":
-      "lzdQLDCP9NoL4jyAbbJy5J3XG5vXt41ptaGhhXJenopWAVN96Gfj754P0HMMuWoa",
+      "ouExmH80Dgm1PsoBL33JDyLqVokvaUi5KMrQ9p712uvzeb04lX5Q6htIWJTSw3Pr",
   },
 });
+
+export default client;

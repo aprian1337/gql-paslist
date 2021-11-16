@@ -1,4 +1,3 @@
-import { Component } from "react";
 import { v4 as uuidv4 } from "uuid";
 import PassengerInput from "./PassengerInput";
 import ListPassenger from "./ListPassenger";
@@ -8,7 +7,18 @@ import { gql, useQuery } from "@apollo/client";
 import React from "react";
 import { useState } from "react/cjs/react.development";
 
+const GetPasList = gql`
+  query MyQuery {
+    paslist_visitors {
+      jenis_kelamin
+      id
+      nama
+      umur
+    }
+  }
+`;
 export default function Home() {
+  const { data, loading, error } = useQuery(GetPasList);
   const [state, setState] = useState({
     data: [
       {
@@ -67,21 +77,13 @@ export default function Home() {
     <div>
       <div>
         <Header />
-        <ListPassenger data={state.data} hapusPengunjung={hapusPengunjung} />
+        {/* {console.log(data)} */}
+        <ListPassenger
+          data={data?.paslist_visitors}
+          hapusPengunjung={hapusPengunjung}
+        />
         <PassengerInput tambahPengunjung={tambahPengunjung} />
       </div>
     </div>
   );
 }
-
-// const GetPasList = gql`
-// query MyQuery {
-//   paslist_visitors {
-//     jenis_kelamin
-//     id
-//     nama
-//     umur
-//   }
-// }
-// `;
-// const { data, loading, error } = useQuery(GetPasList);
