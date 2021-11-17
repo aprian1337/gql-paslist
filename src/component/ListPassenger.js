@@ -4,6 +4,7 @@ const ListPassenger = (props) => {
     <div>
       <table cellPadding="5px" cellSpacing="0" style={{ margin: "auto" }}>
         <thead bgcolor="red">
+          <td>ID</td>
           <td>Nama</td>
           <td>Umur</td>
           <td>Jenis Kelamin</td>

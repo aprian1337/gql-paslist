@@ -4,6 +4,7 @@ const ListItem = (props) => {
 
   return (
     <tr>
+      <td>{id}</td>
       <td>{nama}</td>
       <td>{umur}</td>
       <td>{jenis_kelamin}</td>
