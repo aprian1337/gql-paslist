@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import PassengerInput from "./PassengerInput";
 import ListPassenger from "./ListPassenger";
 import Header from "./Header";
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 
 import React from "react";
 import { useEffect, useState } from "react/cjs/react.development";
@@ -37,6 +37,7 @@ const INSERT_PAS_LIST = gql`
 
 export default function Home() {
   const [input, setInput] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
   const { loading, error, data, refetch } = useQuery(GET_PAS_LIST, {
     variables: { _eq: {} },
     notifyOnNetworkStatusChange: true,
@@ -62,6 +63,10 @@ export default function Home() {
         },
       ],
     });
+  };
+
+  const editPengunjung = (newEditUser) => {
+    setIsEdit(true);
   };
 
   const tambahPengunjung = (newUser) => {
@@ -105,7 +110,7 @@ export default function Home() {
         <Header />
         <input
           type="text"
-          placeholder="Search"
+          placeholder="Search By Id"
           value={input}
           onChange={handleChange}
         />
@@ -114,9 +119,14 @@ export default function Home() {
         <ListPassenger
           data={data?.paslist_visitors}
           hapusPengunjung={hapusPengunjung}
+          editPengunjung={editPengunjung}
         />
         {data?.paslist_visitors.length == 0 ? "Data Tidak Ditemukan" : ""}
-        <PassengerInput tambahPengunjung={tambahPengunjung} />
+        <PassengerInput
+          tambahPengunjung={tambahPengunjung}
+          isEdit={isEdit}
+          setEdit={setIsEdit}
+        />
       </div>
     </div>
   );

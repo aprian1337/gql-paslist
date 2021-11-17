@@ -11,6 +11,9 @@ const ListItem = (props) => {
       <td className="removeBorder" onClick={() => props.hapusPengunjung(id)}>
         <button>Hapus</button>
       </td>
+      <td className="removeBorder" onClick={() => props.editPengunjung(id)}>
+        <button>Edit</button>
+      </td>
     </tr>
   );
 };

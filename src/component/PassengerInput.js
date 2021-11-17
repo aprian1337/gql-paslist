@@ -41,6 +41,7 @@ function PassengerInput(props) {
   };
 
   const handleBukaInput = () => {
+    props.setEdit(false);
     setState({
       ...state,
       editing: false,
