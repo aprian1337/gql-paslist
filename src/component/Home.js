@@ -1,11 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
 import PassengerInput from "./PassengerInput";
 import ListPassenger from "./ListPassenger";
 import Header from "./Header";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 
 import React from "react";
-import { useEffect, useState } from "react/cjs/react.development";
+import { useState, useEffect } from "react";
 import Loading from "./Loading";
 
 const GET_PAS_LIST = gql`
@@ -35,13 +34,51 @@ const INSERT_PAS_LIST = gql`
   }
 `;
 
+const UPDATE_PAS_LIST = gql`
+  mutation MyMutation(
+    $id: Int!
+    $jenis_kelamin: String!
+    $nama: String!
+    $umur: Int!
+  ) {
+    update_paslist_visitors_by_pk(
+      pk_columns: { id: $id }
+      _set: { jenis_kelamin: $jenis_kelamin, nama: $nama, umur: $umur }
+    ) {
+      id
+    }
+  }
+`;
+
+const SUBS_GETALL_PASS_LIST = gql`
+  subscription MyQuery($_eq: Int_comparison_exp = {}) {
+    paslist_visitors(where: { id: $_eq }) {
+      nama
+      id
+      jenis_kelamin
+      umur
+    }
+  }
+`;
+
 export default function Home() {
   const [input, setInput] = useState("");
-  const [isEdit, setIsEdit] = useState(false);
+  const [edit, setEdit] = useState("");
+  // const [Edit, setEdit] = useState({
+  //   nama: "",
+  //   umur: "",
+  //   jenis_kelamin: "",
+  //   is: true,
+  // });
   const { loading, error, data, refetch } = useQuery(GET_PAS_LIST, {
     variables: { _eq: {} },
     notifyOnNetworkStatusChange: true,
   });
+
+  const { data: dataSubs, loading: loadingSubs } = useSubscription(
+    SUBS_GETALL_PASS_LIST
+  );
+
   const [
     insertPasList,
     { data: dataInsert, loading: loadingInsert, error: errorInsert },
@@ -51,6 +88,11 @@ export default function Home() {
     deletePasList,
     { data: dataDelete, loading: loadingDelete, error: errorDelete },
   ] = useMutation(DELETE_PAS_LIST);
+
+  const [
+    updatePasList,
+    { data: dataUpdate, loading: loadingUpdate, error: errorUpdate },
+  ] = useMutation(UPDATE_PAS_LIST);
 
   const hapusPengunjung = (id) => {
     deletePasList({
@@ -66,7 +108,29 @@ export default function Home() {
   };
 
   const editPengunjung = (newEditUser) => {
-    setIsEdit(true);
+    setEdit({
+      is: !edit,
+      id: newEditUser[0],
+      nama: newEditUser[1],
+      umur: newEditUser[2],
+      jenis_kelamin: newEditUser[3],
+    });
+  };
+
+  const updatePengunjung = (editUser) => {
+    updatePasList({
+      variables: {
+        id: editUser.id,
+        nama: editUser.nama,
+        umur: editUser.umur,
+        jenis_kelamin: editUser.jenis_kelamin,
+      },
+      refetchQueries: [
+        {
+          query: GET_PAS_LIST,
+        },
+      ],
+    });
   };
 
   const tambahPengunjung = (newUser) => {
@@ -106,6 +170,7 @@ export default function Home() {
 
   return (
     <div>
+      {/* {console.log(dataSubs)} */}
       <div>
         <Header />
         <input
@@ -114,7 +179,11 @@ export default function Home() {
           value={input}
           onChange={handleChange}
         />
-        {loading || loadingInsert || loadingDelete ? <Loading /> : ""}
+        {loading || loadingInsert || loadingDelete || loadingUpdate ? (
+          <Loading />
+        ) : (
+          ""
+        )}
         {error ? error : ""}
         <ListPassenger
           data={data?.paslist_visitors}
@@ -124,8 +193,9 @@ export default function Home() {
         {data?.paslist_visitors.length == 0 ? "Data Tidak Ditemukan" : ""}
         <PassengerInput
           tambahPengunjung={tambahPengunjung}
-          isEdit={isEdit}
-          setEdit={setIsEdit}
+          updatePengunjung={updatePengunjung}
+          edit={edit}
+          setEdit={setEdit}
         />
       </div>
     </div>

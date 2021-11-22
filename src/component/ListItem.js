@@ -11,7 +11,10 @@ const ListItem = (props) => {
       <td className="removeBorder" onClick={() => props.hapusPengunjung(id)}>
         <button>Hapus</button>
       </td>
-      <td className="removeBorder" onClick={() => props.editPengunjung(id)}>
+      <td
+        className="removeBorder"
+        onClick={() => props.editPengunjung([id, nama, umur, jenis_kelamin])}
+      >
         <button>Edit</button>
       </td>
     </tr>

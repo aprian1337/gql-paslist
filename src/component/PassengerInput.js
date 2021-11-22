@@ -1,13 +1,27 @@
 import { useState } from "react";
+import { useEffect } from "react/cjs/react.development";
 import "./Home.css";
 
 function PassengerInput(props) {
   const [state, setState] = useState({
+    id: "",
     nama: "",
     umur: "",
     jenisKelamin: "Pria",
     editing: true,
+    isEdit: false,
   });
+
+  useEffect(() => {
+    setState({
+      id: props.edit.id,
+      nama: props.edit.nama,
+      umur: props.edit.umur,
+      jenisKelamin: props.edit.jenis_kelamin,
+      editing: false,
+      isEdit: true,
+    });
+  }, [props.edit]);
 
   const onChange = (e) => {
     setState({
@@ -23,15 +37,21 @@ function PassengerInput(props) {
         alert("Umur tidak sesuai");
       } else {
         const newData = {
+          id: state.id,
           nama: state.nama,
           umur: state.umur,
           jenis_kelamin: state.jenisKelamin,
         };
-        props.tambahPengunjung(newData);
+        if (state.isEdit) {
+          props.updatePengunjung(newData);
+        } else {
+          props.tambahPengunjung(newData);
+        }
         setState({
           ...state,
           nama: "",
           umur: "",
+          editing: false,
           jenisKelamin: "Pria",
         });
       }
@@ -40,10 +60,16 @@ function PassengerInput(props) {
     }
   };
 
+  // const handleBukaEdit = () => {
+
+  // }
+
   const handleBukaInput = () => {
-    props.setEdit(false);
+    // props.setEdit(false);
+    // console.log(state);
     setState({
       ...state,
+      isEdit: false,
       editing: false,
     });
   };
@@ -86,10 +112,12 @@ function PassengerInput(props) {
           onChange={onChange}
         />
         <p>Masukkan Jenis Kelamin Anda</p>
-        <select onChange={onChange} name="jenisKelamin">
-          <option value="Pria" selected>
-            Pria
-          </option>
+        <select
+          onChange={onChange}
+          value={state.jenisKelamin}
+          name="jenisKelamin"
+        >
+          <option value="Pria">Pria</option>
           <option value="Wanita">Wanita</option>
         </select>
         <p></p>
